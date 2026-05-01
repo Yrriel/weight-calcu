@@ -10,32 +10,32 @@ app.use(express.json());
 
 //routes
 //create an item
-app.post("/weightcalcu", async (req, res) => {
-    try {
-        const { item_name, item_variation, item_weight } = req.body;
+// app.post("/api/weightcalcu", async (req, res) => {
+//     try {
+//         const { item_name, item_variation, item_weight } = req.body;
 
-        //check if exist before insert
-        if(!item_name.trim() && !item_variation.trim() && !item_weight.trim()){
-            return res.json("some of the inputs are missing or it only contains whitespaces");
-        }
-        if(isNaN(item_weight)){
-            return res.json("weight is not a numerical");
-        }
+//         //check if exist before insert
+//         if(!item_name.trim() && !item_variation.trim() && !item_weight.trim()){
+//             return res.json("some of the inputs are missing or it only contains whitespaces");
+//         }
+//         if(isNaN(item_weight)){
+//             return res.json("weight is not a numerical");
+//         }
 
-        const item_weight_num = parseFloat(item_weight);
+//         const item_weight_num = parseFloat(item_weight);
 
-        const checkItem = await pool.query("SELECT * FROM all_items WHERE UPPER(item_name) = UPPER($1) AND UPPER(item_variation) = UPPER($2)", [item_name, item_variation]);
+//         const checkItem = await pool.query("SELECT * FROM all_items WHERE UPPER(item_name) = UPPER($1) AND UPPER(item_variation) = UPPER($2)", [item_name, item_variation]);
 
-        if(checkItem.rowCount > 0){
-            return res.json("Item already exist");
-        }
+//         if(checkItem.rowCount > 0){
+//             return res.json("Item already exist");
+//         }
 
-        const newItem = await pool.query("INSERT INTO all_items (item_name, item_variation, item_weight) VALUES(UPPER($1), UPPER($2), ($3))", [item_name, item_variation, item_weight_num]);
-        return res.json("Added new Item");
-    } catch (err) {
-        console.error(err.message);
-    }
-});
+//         const newItem = await pool.query("INSERT INTO all_items (item_name, item_variation, item_weight) VALUES(UPPER($1), UPPER($2), ($3))", [item_name, item_variation, item_weight_num]);
+//         return res.json("Added new Item");
+//     } catch (err) {
+//         console.error(err.message);
+//     }
+// });
 
 app.put("/api/weightcalcu/:item_id", async (req, res) => {
     try {
@@ -64,7 +64,7 @@ app.put("/api/weightcalcu/:item_id", async (req, res) => {
 
 });
 
-app.get("/weightcalcu", async (req, res) => {
+app.get("/api/weightcalcu", async (req, res) => {
     try {
         // Use DISTINCT so the first dropdown only shows each name once
         const listItem = await pool.query("SELECT DISTINCT item_name FROM all_items");
@@ -85,18 +85,18 @@ app.get("/api/weightcalcu/:id", async (req, res) => {
     }
 });
 
-app.delete("/api/weightcalcu/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deleteItem = await pool.query("DELETE FROM all_items WHERE item_id = $1", [id]);
-        res.json("item has been deleted.");
-    } catch (err) {
-        console.error(err.message);
-    }
-});
+// app.delete("/api/weightcalcu/:id", async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const deleteItem = await pool.query("DELETE FROM all_items WHERE item_id = $1", [id]);
+//         res.json("item has been deleted.");
+//     } catch (err) {
+//         console.error(err.message);
+//     }
+// });
 
 // Get variations based on Item Name
-app.get("/items/:itemName", async (req, res) => {
+app.get("/api/items/:itemName", async (req, res) => {
     try {
         const { itemName } = req.params;
         // We use UPPER to match your INSERT logic
