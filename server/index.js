@@ -37,7 +37,7 @@ app.post("/weightcalcu", async (req, res) => {
     }
 });
 
-app.put("/weightcalcu/:item_id", async (req, res) => {
+app.put("/api/weightcalcu/:item_id", async (req, res) => {
     try {
         //init properties
         const { item_id } = req.params;
@@ -74,7 +74,7 @@ app.get("/weightcalcu", async (req, res) => {
     }
 });
 
-app.get("/weightcalcu/:id", async (req, res) => {
+app.get("/api/weightcalcu/:id", async (req, res) => {
     try {
         //init
         const { id } = req.params;
@@ -85,7 +85,7 @@ app.get("/weightcalcu/:id", async (req, res) => {
     }
 });
 
-app.delete("/weightcalcu/:id", async (req, res) => {
+app.delete("/api/weightcalcu/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const deleteItem = await pool.query("DELETE FROM all_items WHERE item_id = $1", [id]);
