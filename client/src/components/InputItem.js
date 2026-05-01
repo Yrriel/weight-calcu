@@ -126,7 +126,7 @@ const MultiItemSelector = () => {
             </button>
             
             <span style={{ fontWeight: "bold" }}>
-              Subtotal: {row.weight * row.qty}g
+              Subtotal: {row.weight * row.qty} kg
             </span>
           </div>
         );
@@ -137,7 +137,7 @@ const MultiItemSelector = () => {
       </button>
 
       <div style={{ marginTop: "30px", borderTop: "2px solid black", paddingTop: "10px" }}>
-        <h3>Grand Total Weight: {grandTotal} g</h3>
+        <h3>Grand Total Weight: {grandTotal} kg</h3>
       </div>
     </div>
   );
