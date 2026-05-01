@@ -5,7 +5,7 @@ const MultiItemSelector = () => {
   const [itemList, setItemList] = useState([]);
   
   const [rows, setRows] = useState([
-    { id: Date.now(), selectedItem: '', variants: [], weight: 0, qty: 1 }
+    { id: Date.now(), selectedItem: '', selectedVariantId: null, variants: [], weight: 0, qty: 1 }
   ]);
 
   useEffect(() => {
@@ -22,7 +22,10 @@ const MultiItemSelector = () => {
   }, []);
 
   const addRow = () => {
-    setRows([...rows, { id: Date.now(), selectedItem: '', variants: [], weight: 0, qty: 1 }]);
+    setRows([
+      ...rows,
+      { id: Date.now(), selectedItem: '', selectedVariantId: null, variants: [], weight: 0, qty: 1 }
+    ]);
   };
 
   const removeRow = (id) => {
@@ -35,13 +38,22 @@ const MultiItemSelector = () => {
 
     if (field === 'selectedItem') {
       if (value) {
-        const response = await fetch(`/api/items/${value}`);
+        const response = await fetch(`/api/items/${encodeURIComponent(value)}`);
         const jsonData = await response.json();
         updatedRows[index].variants = jsonData;
       } else {
         updatedRows[index].variants = [];
       }
-      updatedRows[index].weight = 0; 
+      updatedRows[index].selectedVariantId = null;
+      updatedRows[index].weight = 0;
+    }
+
+    if (field === 'selectedVariantId') {
+      const selectedVariant = updatedRows[index].variants.find(
+        variant => String(variant.item_id) === String(value)
+      );
+
+      updatedRows[index].weight = selectedVariant ? Number(selectedVariant.item_weight) : 0;
     }
 
     setRows(updatedRows);
@@ -59,12 +71,14 @@ const MultiItemSelector = () => {
       {rows.map((row, index) => {
         // Format the second dropdown's options dynamically per row
         const variantOptions = row.variants.map(v => ({
-          value: v.item_weight,
+          value: v.item_id,
           label: `${v.item_variation} (${v.item_weight}g)`
         }));
 
         // Find the current selected variant to display the correct label
-        const selectedVariantOption = variantOptions.find(opt => opt.value === row.weight) || null;
+        const selectedVariantOption = variantOptions.find(
+          opt => String(opt.value) === String(row.selectedVariantId)
+        ) || null;
 
         return (
           <div 
@@ -94,8 +108,8 @@ const MultiItemSelector = () => {
               <Select
                 isDisabled={!row.selectedItem}
                 options={variantOptions}
-                value={row.weight !== 0 ? selectedVariantOption : null}
-                onChange={(selectedOption) => handleRowChange(index, 'weight', selectedOption ? selectedOption.value : 0)}
+                value={selectedVariantOption}
+                onChange={(selectedOption) => handleRowChange(index, 'selectedVariantId', selectedOption ? selectedOption.value : null)}
                 placeholder="Select Variation"
                 isClearable
               />
