@@ -35,7 +35,7 @@ const MultiItemSelector = () => {
 
     if (field === 'selectedItem') {
       if (value) {
-        const response = await fetch(`http://localhost:5000/items/${value}`);
+        const response = await fetch(`api/items/${value}`);
         const jsonData = await response.json();
         updatedRows[index].variants = jsonData;
       } else {
