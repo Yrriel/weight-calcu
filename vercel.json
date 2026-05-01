@@ -1,8 +1,7 @@
 {
+  "version": 2,
   "rewrites": [
-    {
-      "source": "/api/:match*",
-      "destination": "server/index.js"
-    }
+    { "source": "/api/(.*)", "destination": "/server/index.js" },
+    { "source": "/(.*)", "destination": "/client/$1" }
   ]
 }
