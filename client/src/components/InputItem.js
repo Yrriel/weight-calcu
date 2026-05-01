@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select"; // 1. Import react-select
 
 const MultiItemSelector = () => {
-  const [itemList, setItemList] = useState([]);
+  const [items, setItems] = useState([]);
   
   const [rows, setRows] = useState([
-    { id: Date.now(), selectedItem: '', selectedVariantId: null, variants: [], weight: 0, qty: 1 }
+    { id: Date.now(), selectedItem: '', selectedVariantId: null, weight: 0, qty: 1 }
   ]);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch("/api/weightcalcu");
+        const response = await fetch("/api/items");
         const jsonData = await response.json();
-        setItemList(jsonData.map(item => item.item_name));
+        setItems(jsonData);
       } catch (err) {
         console.error(err.message);
       }
@@ -24,7 +24,7 @@ const MultiItemSelector = () => {
   const addRow = () => {
     setRows([
       ...rows,
-      { id: Date.now(), selectedItem: '', selectedVariantId: null, variants: [], weight: 0, qty: 1 }
+      { id: Date.now(), selectedItem: '', selectedVariantId: null, weight: 0, qty: 1 }
     ]);
   };
 
@@ -37,19 +37,12 @@ const MultiItemSelector = () => {
     updatedRows[index][field] = value;
 
     if (field === 'selectedItem') {
-      if (value) {
-        const response = await fetch(`/api/items/${encodeURIComponent(value)}`);
-        const jsonData = await response.json();
-        updatedRows[index].variants = jsonData;
-      } else {
-        updatedRows[index].variants = [];
-      }
       updatedRows[index].selectedVariantId = null;
       updatedRows[index].weight = 0;
     }
 
     if (field === 'selectedVariantId') {
-      const selectedVariant = updatedRows[index].variants.find(
+      const selectedVariant = items.find(
         variant => String(variant.item_id) === String(value)
       );
 
@@ -62,7 +55,8 @@ const MultiItemSelector = () => {
   const grandTotal = rows.reduce((acc, row) => acc + (row.weight * row.qty), 0);
 
   // Pre-format the first dropdown's options
-  const itemOptions = itemList.map(name => ({ value: name, label: name }));
+  const itemOptions = [...new Set(items.map(item => item.item_name))]
+    .map(name => ({ value: name, label: name }));
 
   return (
     <div style={{ padding: "20px" }}>
@@ -70,10 +64,12 @@ const MultiItemSelector = () => {
       
       {rows.map((row, index) => {
         // Format the second dropdown's options dynamically per row
-        const variantOptions = row.variants.map(v => ({
-          value: v.item_id,
-          label: `${v.item_variation} (${v.item_weight}g)`
-        }));
+        const variantOptions = items
+          .filter(item => item.item_name === row.selectedItem)
+          .map(item => ({
+            value: item.item_id,
+            label: `${item.item_variation} (${item.item_weight}g)`
+          }));
 
         // Find the current selected variant to display the correct label
         const selectedVariantOption = variantOptions.find(

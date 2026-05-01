@@ -85,6 +85,18 @@ app.get("/api/weightcalcu/:id", async (req, res) => {
     }
 });
 
+app.get("/api/items", async (req, res) => {
+    try {
+        const items = await pool.query(
+            "SELECT * FROM all_items ORDER BY item_name, item_variation"
+        );
+        res.json(items.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
 // app.delete("/api/weightcalcu/:id", async (req, res) => {
 //     try {
 //         const { id } = req.params;
